@@ -1,6 +1,6 @@
 <?php namespace Love4Work\Cart;
 
-use Darryldecode\Cart\Cart as ThirdPartyCartCondition;
+use Darryldecode\Cart\CartCondition as ThirdPartyCartCondition;
 
 /**
  * Class CartCondition
