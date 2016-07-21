@@ -12,10 +12,23 @@
         "php": ">=5.6",
         "darryldecode/cart": "dev-master"
     },
+    "require-dev": {
+        "mockery/mockery": "~0.9",
+        "phpunit/phpunit": "~4.0",
+        "symfony/var-dumper": "2.7.*@dev"
+    },
     "autoload": {
         "psr-4": {
             "Love4Work\\": "src/Love4Work"
         }
+    },
+    "autoload-dev": {
+        "psr-0": {
+            "": "tests/helpers/"
+        },
+        "classmap": [
+            "tests/TestCase.php"
+        ]
     },
     "minimum-stability": "dev"
 }
