@@ -1,0 +1,21 @@
+{
+    "name": "love4work/laravel-cart",
+    "description": "Wrapper for darryldecode/cart, improve API readability and improve common methods",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Peter Quentin",
+            "email": "peter@love4work.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.6",
+        "darryldecode/cart": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Love4Work\\": "src/Love4Work"
+        }
+    },
+    "minimum-stability": "dev"
+}
