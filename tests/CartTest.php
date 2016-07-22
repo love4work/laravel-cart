@@ -24,7 +24,7 @@ class CartTest extends TestCase
 
         $cartItem = $cart->add($item);
 
-        $this->assertEquals('€ 40,00', $cart->money($cartItem->subtotal()));
+        $this->assertEquals('€ 40,00', $cartItem->subtotal());
     }
 
     /** @test */
@@ -35,7 +35,7 @@ class CartTest extends TestCase
 
         $cartItem = $cart->add($item);
 
-        $this->assertEquals('€ 48,40', $cart->money($cartItem->total()));
+        $this->assertEquals('€ 48,40', $cartItem->total());
     }
 
     /** @test */
@@ -46,7 +46,7 @@ class CartTest extends TestCase
 
         $cart->add($item);
 
-        $this->assertEquals('€ 10,00', $cart->money($cart->subtotal()));
+        $this->assertEquals('€ 10,00', $cart->subtotal()->format());
     }
 
     /** @test */
@@ -57,6 +57,6 @@ class CartTest extends TestCase
 
         $cart->add($item)->setTaxRate(0);
 
-        $this->assertEquals('€ 10,00', $cart->money($cart->total()));
+        $this->assertEquals('€ 10,00', $cart->total()->format());
     }
 }

@@ -244,11 +244,9 @@ class Cart
      * Get the total price of the items in the cart.
      *
      * @param int    $decimals
-     * @param string $decimalPoint
-     * @param string $thousandSeperator
-     * @return float
+     * @return \Love4work\Cart\MoneyProxy
      */
-    public function total($decimals = 2, $decimalPoint = '.', $thousandSeperator = ',')
+    public function total($decimals = 2)
     {
         $content = $this->getContent();
 
@@ -256,18 +254,16 @@ class Cart
             return $total + ($cartItem->qty * $cartItem->priceTax);
         }, 0);
 
-        return number_format($total, $decimals, $decimalPoint, $thousandSeperator);
+        return new MoneyProxy($total, $this->currency());
     }
 
     /**
      * Get the total tax of the items in the cart.
      *
      * @param int    $decimals
-     * @param string $decimalPoint
-     * @param string $thousandSeperator
-     * @return float
+     * @return \Love4work\Cart\MoneyProxy
      */
-    public function tax($decimals = 2, $decimalPoint = '.', $thousandSeperator = ',')
+    public function tax($decimals = 2)
     {
         $content = $this->getContent();
 
@@ -275,18 +271,16 @@ class Cart
             return $tax + ($cartItem->qty * $cartItem->tax);
         }, 0);
 
-        return number_format($tax, $decimals, $decimalPoint, $thousandSeperator);
+        return new MoneyProxy($tax, $this->currency());
     }
 
     /**
      * Get the subtotal (total - tax) of the items in the cart.
      *
      * @param int    $decimals
-     * @param string $decimalPoint
-     * @param string $thousandSeperator
-     * @return float
+     * @return \Love4work\Cart\MoneyProxy
      */
-    public function subtotal($decimals = 2, $decimalPoint = '.', $thousandSeperator = ',')
+    public function subtotal($decimals = 2)
     {
         $content = $this->getContent();
 
@@ -294,7 +288,7 @@ class Cart
             return $subTotal + ($cartItem->qty * $cartItem->price);
         }, 0);
 
-        return number_format($subTotal, $decimals, $decimalPoint, $thousandSeperator);
+        return new MoneyProxy($subTotal, $this->currency());
     }
 
     /**
@@ -423,15 +417,15 @@ class Cart
     public function __get($attribute)
     {
         if($attribute === 'total') {
-            return $this->total(2, '.', '');
+            return $this->total(2);
         }
 
         if($attribute === 'tax') {
-            return $this->tax(2, '.', '');
+            return $this->tax(2);
         }
 
         if($attribute === 'subtotal') {
-            return $this->subtotal(2, '.', '');
+            return $this->subtotal(2);
         }
 
         return null;

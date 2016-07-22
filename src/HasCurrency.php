@@ -36,23 +36,11 @@ trait HasCurrency
 
     /**
      * @param $value
-     * @param bool $convertToCents
-     *
-     * @return Money
+     * @return MoneyProxy
      */
-    public function money($value, $convertToCents=true)
+    public function moneyProxy($value)
     {
-        if($convertToCents)
-        {
-            $value *= 100;
-        }
-        return $this->formatMoney(new Money($value, $this->currency()));
-    }
-
-    protected function formatMoney(Money $money)
-    {
-        $numberFormatter = new NumberFormatter(config('app.locale_php'), NumberFormatter::CURRENCY);
-        return (new IntlMoneyFormatter($numberFormatter))->format($money);
+        return new MoneyProxy($value, $this->currency());
     }
 
 }
