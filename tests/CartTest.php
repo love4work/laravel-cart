@@ -17,15 +17,46 @@ class CartTest extends TestCase
     }
 
     /** @test */
-    public function it_can_represent_total_in_money()
+    public function it_can_present_subtotal_of_item_in_money()
     {
         $cart = $this->getCart();
+        $item = $this->getBuyableMock(1, "Test Product", 40.00);
 
+        $cartItem = $cart->add($item);
+
+        $this->assertEquals('€ 40,00', $cart->money($cartItem->subtotal()));
+    }
+
+    /** @test */
+    public function it_can_present_total_of_item_in_money()
+    {
+        $cart = $this->getCart();
+        $item = $this->getBuyableMock(1, "Test Product", 40.00);
+
+        $cartItem = $cart->add($item);
+
+        $this->assertEquals('€ 48,40', $cart->money($cartItem->total()));
+    }
+
+    /** @test */
+    public function it_can_present_subtotal_in_money()
+    {
+        $cart = $this->getCart();
         $item = $this->getBuyableMock();
-        $item->setTaxRate(0);
+
         $cart->add($item);
 
-        $this->assertEquals(1, $cart->count());
-        $this->assertEquals($cart->money($cart->total()), '€ 12,10');
+        $this->assertEquals('€ 10,00', $cart->money($cart->subtotal()));
+    }
+
+    /** @test */
+    public function it_can_present_total_in_money()
+    {
+        $cart = $this->getCart();
+        $item = $this->getBuyableMock();
+
+        $cart->add($item)->setTaxRate(0);
+
+        $this->assertEquals('€ 10,00', $cart->money($cart->total()));
     }
 }

@@ -475,9 +475,7 @@ class Cart
             $cartItem->setQuantity($qty);
         }
 
-        $cartItem->setTaxRate(config('cart.tax'));
-
-        return $cartItem;
+        return $cartItem->setTaxRate(config('cart.tax'));
     }
 
     /**
