@@ -58,7 +58,7 @@ class VendorCartTest extends TestCase
 
         $cartItem = $cart->add($item);
 
-        $this->assertInstanceOf(\Gloudemans\Shoppingcart\CartItem::class, $cartItem);
+        $this->assertInstanceOf(\Love4work\Cart\CartItem::class, $cartItem);
         $this->assertEquals('027c91341fd5cf4d2579b49c4b6a90da', $cartItem->rowId);
     }
 
@@ -91,7 +91,7 @@ class VendorCartTest extends TestCase
 
         $this->assertTrue(is_array($cartItems));
         $this->assertCount(2, $cartItems);
-        $this->assertContainsOnlyInstancesOf(\Gloudemans\Shoppingcart\CartItem::class, $cartItems);
+        $this->assertContainsOnlyInstancesOf(\Love4work\Cart\CartItem::class, $cartItems);
     }
 
     /** @test */
@@ -148,7 +148,7 @@ class VendorCartTest extends TestCase
 
         $cartItem = $cart->get('07d5da5550494c62daf9993cf954303f');
 
-        $this->assertInstanceOf(\Gloudemans\Shoppingcart\CartItem::class, $cartItem);
+        $this->assertInstanceOf(\Love4work\Cart\CartItem::class, $cartItem);
         $this->assertEquals('XL', $cartItem->options->size);
         $this->assertEquals('red', $cartItem->options->color);
     }
@@ -395,7 +395,7 @@ class VendorCartTest extends TestCase
 
         $cartItem = $cart->get('027c91341fd5cf4d2579b49c4b6a90da');
 
-        $this->assertInstanceOf(\Gloudemans\Shoppingcart\CartItem::class, $cartItem);
+        $this->assertInstanceOf(\Love4work\Cart\CartItem::class, $cartItem);
     }
 
     /** @test */
@@ -527,7 +527,7 @@ class VendorCartTest extends TestCase
 
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $cartItem);
         $this->assertCount(1, $cartItem);
-        $this->assertInstanceOf(\Gloudemans\Shoppingcart\CartItem::class, $cartItem->first());
+        $this->assertInstanceOf(\Love4work\Cart\CartItem::class, $cartItem->first());
         $this->assertEquals(1, $cartItem->first()->id);
     }
 
@@ -568,7 +568,7 @@ class VendorCartTest extends TestCase
 
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $cartItem);
         $this->assertCount(1, $cartItem);
-        $this->assertInstanceOf(\Gloudemans\Shoppingcart\CartItem::class, $cartItem->first());
+        $this->assertInstanceOf(\Love4work\Cart\CartItem::class, $cartItem->first());
         $this->assertEquals(1, $cartItem->first()->id);
     }
 

@@ -10,7 +10,8 @@
     ],
     "require": {
         "php": ">=5.6",
-        "gloudemans/shoppingcart": "dev-master"
+        "gloudemans/shoppingcart": "dev-master",
+        "mathiasverraes/money": "dev-master"
     },
     "require-dev": {
         "mockery/mockery": "~0.9",

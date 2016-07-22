@@ -1,7 +1,6 @@
 <?php namespace Love4work\Cart;
 
 use Closure;
-use Gloudemans\Shoppingcart\Cart as ThirdPartyCart;
 use Gloudemans\Shoppingcart\Contracts\Buyable;
 use Gloudemans\Shoppingcart\Exceptions\CartAlreadyStoredException;
 use Gloudemans\Shoppingcart\Exceptions\InvalidRowIDException;
@@ -10,6 +9,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Session\SessionManager;
 use Illuminate\Support\Collection;
+use Money\Currency;
 
 /**
  * Class Cart
@@ -17,6 +17,8 @@ use Illuminate\Support\Collection;
  */
 class Cart
 {
+    use HasCurrency;
+
     const DEFAULT_INSTANCE = 'default';
 
     /**

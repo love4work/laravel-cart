@@ -1,7 +1,5 @@
 <?php
 
-use Love4work\Cart\Cart;
-
 class CartTest extends TestCase
 {
     /** @test */
@@ -16,7 +14,18 @@ class CartTest extends TestCase
 
         $this->assertEquals(1, $cart->count());
         $this->assertFalse($cart->isEmpty(), 'Cart should not be empty');
-        $cart->add(455, 'Sample Item', 100.99, 2, array());
-        
+    }
+
+    /** @test */
+    public function it_can_represent_total_in_money()
+    {
+        $cart = $this->getCart();
+
+        $item = $this->getBuyableMock();
+        $item->setTaxRate(0);
+        $cart->add($item);
+
+        $this->assertEquals(1, $cart->count());
+        $this->assertEquals($cart->money($cart->total()), '€ 12,10');
     }
 }

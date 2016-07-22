@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "579cb05579e947a20d35d0eeccdc49b8",
-    "content-hash": "349e5291bbaff5658532b93c6f1b2c1d",
+    "hash": "b2be55dd3f369ef0770e1d438d393a31",
+    "content-hash": "6126d86a084e0bad08a67306b562cb61",
     "packages": [
         {
             "name": "classpreloader/classpreloader",
@@ -418,12 +418,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "1657abd3a7b0bf0d61782c1eb2801517d619868e"
+                "reference": "bf064f5bd38b1993ef5096cd1b7fe9d9d149dbf1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/1657abd3a7b0bf0d61782c1eb2801517d619868e",
-                "reference": "1657abd3a7b0bf0d61782c1eb2801517d619868e",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/bf064f5bd38b1993ef5096cd1b7fe9d9d149dbf1",
+                "reference": "bf064f5bd38b1993ef5096cd1b7fe9d9d149dbf1",
                 "shasum": ""
             },
             "require": {
@@ -539,7 +539,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2016-07-21 15:00:13"
+            "time": "2016-07-22 13:25:32"
         },
         {
             "name": "league/flysystem",
@@ -623,6 +623,82 @@
                 "storage"
             ],
             "time": "2016-07-21 09:35:56"
+        },
+        {
+            "name": "mathiasverraes/money",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/moneyphp/money.git",
+                "reference": "d71d5e3a9f72abcd5fedbdd8c9bd793373c7c405"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/moneyphp/money/zipball/d71d5e3a9f72abcd5fedbdd8c9bd793373c7c405",
+                "reference": "d71d5e3a9f72abcd5fedbdd8c9bd793373c7c405",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5"
+            },
+            "require-dev": {
+                "cache/taggable-cache": "^0.4.0",
+                "coduo/phpspec-data-provider-extension": "^1.0.3",
+                "ext-bcmath": "*",
+                "ext-gmp": "*",
+                "ext-intl": "*",
+                "florianv/swap": "^2.3",
+                "henrikbjorn/phpspec-code-coverage": "^2.0.2",
+                "phpspec/phpspec": "^2.5",
+                "phpunit/phpunit": "^4.5",
+                "psr/cache": "^1.0",
+                "umpirsky/currency-list": "^1.0"
+            },
+            "suggest": {
+                "ext-bcmath": "Calculate without integer limits",
+                "ext-gmp": "Calculate without integer limits",
+                "ext-intl": "Format Money objects with intl",
+                "florianv/swap": "Exchange rates library for PHP",
+                "psr/cache-implementation": "Used for Currency caching"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Money\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mathias Verraes",
+                    "email": "mathias@verraes.net",
+                    "homepage": "http://verraes.net"
+                },
+                {
+                    "name": "Frederik Bosch",
+                    "email": "f.bosch@genkgo.nl"
+                },
+                {
+                    "name": "Márk Sági-Kazár",
+                    "email": "mark.sagi-kazar@gmail.com"
+                }
+            ],
+            "description": "PHP implementation of Fowler's Money pattern",
+            "homepage": "http://verraes.net/2011/04/fowler-money-pattern-in-php/",
+            "keywords": [
+                "Value Object",
+                "money",
+                "vo"
+            ],
+            "time": "2016-07-06 06:43:28"
         },
         {
             "name": "monolog/monolog",
@@ -3398,6 +3474,7 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "gloudemans/shoppingcart": 20,
+        "mathiasverraes/money": 20,
         "symfony/var-dumper": 20
     },
     "prefer-stable": false,

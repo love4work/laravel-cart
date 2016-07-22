@@ -1,4 +1,6 @@
-<?php namespace Love4work\Cart;
+<?php
+
+namespace Love4work\Cart;
 
 use Illuminate\Support\ServiceProvider;
 

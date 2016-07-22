@@ -24,7 +24,10 @@ abstract class TestCase extends Orchestra\Testbench\TestCase
      */
     protected function getEnvironmentSetUp($app)
     {
+        $app['config']->set('app.locale_php', 'nl_NL');
         $app['config']->set('cart.database.connection', 'testing');
+        $app['config']->set('cart.defaultCurrency', 'EUR');
+        $app['config']->set('cart.tax', 21);
 
         $app['config']->set('session.driver', 'array');
 
@@ -63,6 +66,7 @@ abstract class TestCase extends Orchestra\Testbench\TestCase
     {
         $item = Mockery::mock(Buyable::class)->shouldIgnoreMissing();
 
+        $item->shouldAllowMockingMethod('setTaxRate');
         $item->shouldReceive('getBuyableIdentifier')->andReturn($id);
         $item->shouldReceive('getBuyableDescription')->andReturn($name);
         $item->shouldReceive('getBuyablePrice')->andReturn($price);
