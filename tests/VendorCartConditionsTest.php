@@ -86,7 +86,7 @@ class VendorCartConditionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(18749, $this->cart->subTotal(), 'Cart should have sub total of 18749');
 
 		// total should be changed
-		$this->assertEquals(21093, $this->cart->total(), 'Cart should have a total of 21093');
+		$this->assertEquals(21093, $this->cart->total(0), 'Cart should have a total of 21093');
 	}
 
 	public function test_total_with_multiple_conditions_added_scenario_one() {
@@ -115,7 +115,7 @@ class VendorCartConditionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(18749, $this->cart->subTotal(), 'Cart should have sub total of 18749');
 
 		// total should be changed
-		$this->assertEquals(22593, $this->cart->total(), 'Cart should have a total of 22593');
+		$this->assertEquals(22593, $this->cart->total(0), 'Cart should have a total of 22593');
 	}
 
 	public function test_total_with_multiple_conditions_added_scenario_two() {
@@ -144,7 +144,7 @@ class VendorCartConditionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(18749, $this->cart->subTotal(), 'Cart should have sub total of 18749');
 
 		// total should be changed
-		$this->assertEquals(19593, $this->cart->total(), 'Cart should have a total of 19593');
+		$this->assertEquals(19593, $this->cart->total(0), 'Cart should have a total of 19593');
 	}
 
 	public function test_total_with_multiple_conditions_added_scenario_three() {
@@ -173,7 +173,7 @@ class VendorCartConditionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(18749, $this->cart->subTotal(), 'Cart should have sub total of 18749');
 
 		// total should be changed
-		$this->assertEquals(14905, $this->cart->total(), 'Cart should have a total of 14905');
+		$this->assertEquals(14905, $this->cart->total(0), 'Cart should have a total of 14905');
 	}
 
 	public function test_cart_multiple_conditions_can_be_added_once_by_array() {
@@ -201,7 +201,7 @@ class VendorCartConditionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(18749, $this->cart->subTotal(), 'Cart should have sub total of 18749');
 
 		// total should be changed
-		$this->assertEquals(14905, $this->cart->total(), 'Cart should have a total of 14905');
+		$this->assertEquals(14905, $this->cart->total(0), 'Cart should have a total of 14905');
 	}
 
 	public function test_total_with_multiple_conditions_added_scenario_four() {
@@ -230,7 +230,7 @@ class VendorCartConditionTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(18749, $this->cart->subTotal(), 'Cart should have sub total of 18749');
 
 		// total should be changed
-		$this->assertEquals(17905, $this->cart->total(), 'Cart should have a total of 17905');
+		$this->assertEquals(17905, $this->cart->total(0), 'Cart should have a total of 17905');
 	}
 
 	public function test_add_item_with_condition() {

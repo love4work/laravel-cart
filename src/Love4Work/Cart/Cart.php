@@ -3,6 +3,7 @@
 use Bnet\Cart\Attribute;
 use Bnet\Cart\Cart as ThirdPartyCart;
 use Bnet\Cart\Helpers\Helpers;
+use Bnet\Cart\Item;
 
 /**
  * Class Cart
@@ -86,16 +87,13 @@ class Cart extends ThirdPartyCart {
 
         foreach($data as $key => $value)
         {
-            if( $key == 'quantity' )
-            {
+            if( $key == 'quantity' ) {
                 $item = $this->updateQuantity($item, $key, $value);
             }
-            elseif( $key == 'attributes' )
-            {
+            elseif( $key == 'attributes' ) {
                 $item[$key] = new Attribute($value);
             }
-            else
-            {
+            else {
                 $item[$key] = $value;
             }
         }
@@ -117,27 +115,72 @@ class Cart extends ThirdPartyCart {
      */
     protected function updateQuantity($item, $key, $value)
     {
-        if( preg_match('/\-/', $value) == 1 )
-        {
+        if( preg_match('/\-/', $value) == 1 ) {
             $value = (int) str_replace('-','',$value);
 
             // we will not allowed to reduced quantity to 0, so if the given value
             // would result to item quantity of 0, we will not do it.
-            if( ($item[$key] - $value) > 0 )
-            {
+            if( ($item[$key] - $value) > 0 ) {
                 $item[$key] -= $value;
             }
         }
-        elseif( preg_match('/\+/', $value) == 1 )
-        {
+        elseif( preg_match('/\+/', $value) == 1 ) {
             $item[$key] += (int) str_replace('+','',$value);
         }
-        else
-        {
+        else {
             $item[$key] = (int) $value;
         }
 
         return $item;
+    }
+
+    /**
+     * get cart sub total
+     *
+     * @param int $precision
+     *
+     * @return int
+     */
+    public function subTotal($precision = 2) {
+        $cart = $this->items();
+
+        $sum = $cart->sum(function (Item $item) {
+            return $item->priceSumWithConditions();
+        });
+
+        return Helpers::round($sum, $precision);
+    }
+
+    /**
+     * the new total in which conditions are already applied
+     *
+     * @param int $precision
+     *
+     * @return int
+     */
+    public function total($precision = 2)
+    {
+        $subTotal = $this->subTotal($precision);
+
+        $newTotal = 0;
+        $process = 0;
+
+        $conditions = $this->getConditions();
+
+        // if no conditions were added, just return the sub total
+        if (!$conditions->count()) return $subTotal;
+
+        $conditions->each(function ($cond) use ($subTotal, &$newTotal, &$process, $precision) {
+            if ($cond->getTarget() === 'subtotal') {
+                $toBeCalculated = ($process > 0) ? $newTotal : $subTotal;
+
+                $newTotal = $cond->applyCondition($toBeCalculated, $precision);
+
+                $process++;
+            }
+        });
+
+        return $newTotal;
     }
 
 }

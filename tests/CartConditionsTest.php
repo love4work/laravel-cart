@@ -43,7 +43,7 @@ class CartConditionTest extends TestCase  {
         $this->assertEquals(187.49, $this->cart->subTotal(), 'Cart should have sub total of 187.49');
 
         // total should be changed
-        $this->assertEquals(226.8629, $this->cart->total(), 'Cart should have a total of 226.8629');
+        $this->assertEquals(226.86, $this->cart->total(), 'Cart should have a total of 226.86');
     }
 
     public function test_add_item_with_simplified_tax_condition()
