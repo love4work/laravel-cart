@@ -12,9 +12,10 @@ class CartServiceProvider extends ServiceProvider
 	public function register()
 	{
 		$this->app->bind('cart', 'Love4work\Cart\Cart');
-		
-		$config = __DIR__ . '/../config/cart.php';
-		$this->mergeConfigFrom($config, 'cart');
+
+		$this->publishes([
+			__DIR__.'/../config/cart.php' => config_path('cart.php')
+		], 'config');
 		
 		if ( ! class_exists('CreateShoppingcartTable')) {
 			// Publish the migration
