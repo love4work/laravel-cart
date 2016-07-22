@@ -1,6 +1,6 @@
 <?php
 
-use Love4Work\Cart\Cart;
+use Love4work\Cart\Cart;
 
 class CartTest extends TestCase
 {

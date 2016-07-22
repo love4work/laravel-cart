@@ -1,10 +1,10 @@
-<?php namespace Love4Work\Cart\Conditions;
+<?php namespace Love4work\Cart\Conditions;
 
-use Love4Work\Cart\Condition;
+use Love4work\Cart\Condition;
 
 /**
  * Class Tax
- * @package Love4Work\Cart
+ * @package Love4work\Cart
  */
 class Tax extends Condition
 {

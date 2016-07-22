@@ -1,6 +1,6 @@
 <?php
 
-namespace Love4Work\Cart;
+namespace Love4work\Cart;
 
 use Gloudemans\Shoppingcart\CartItem as ThirdPartyCartItem;
 use Gloudemans\Shoppingcart\Contracts\Buyable;
@@ -12,7 +12,7 @@ class CartItem extends ThirdPartyCartItem
      *
      * @param \Gloudemans\Shoppingcart\Contracts\Buyable $item
      * @param array                                      $options
-     * @return \Love4Work\Cart\CartItem
+     * @return \Love4work\Cart\CartItem
      */
     public static function fromBuyable(Buyable $item, array $options = [])
     {
@@ -23,7 +23,7 @@ class CartItem extends ThirdPartyCartItem
      * Create a new instance from the given array.
      *
      * @param array $attributes
-     * @return \Love4Work\Cart\CartItem
+     * @return \Love4work\Cart\CartItem
      */
     public static function fromArray(array $attributes)
     {
@@ -39,7 +39,7 @@ class CartItem extends ThirdPartyCartItem
      * @param string     $name
      * @param float      $price
      * @param array      $options
-     * @return \Love4Work\Cart\CartItem
+     * @return \Love4work\Cart\CartItem
      */
     public static function fromAttributes($id, $name, $price, array $options = [])
     {

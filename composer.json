@@ -20,7 +20,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Love4Work\\": "src/Love4Work"
+            "Love4work\\Cart\\": "src/"
         }
     },
     "autoload-dev": {

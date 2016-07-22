@@ -1,6 +1,6 @@
 <?php
 
-use Love4Work\Cart\Cart;
+use Love4work\Cart\Cart;
 use Gloudemans\Shoppingcart\Contracts\Buyable;
 
 abstract class TestCase extends Orchestra\Testbench\TestCase
@@ -13,7 +13,7 @@ abstract class TestCase extends Orchestra\Testbench\TestCase
      */
     protected function getPackageProviders($app)
     {
-        return [\Love4Work\Cart\CartServiceProvider::class];
+        return [\Love4work\Cart\CartServiceProvider::class];
     }
 
     /**

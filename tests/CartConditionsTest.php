@@ -1,6 +1,6 @@
 <?php
 
-use Love4Work\Cart\Conditions\Tax;
+use Love4work\Cart\Conditions\Tax;
 
 class CartConditionTest extends TestCase
 {

@@ -1,4 +1,4 @@
-<?php namespace Love4Work\Cart\Facades;
+<?php namespace Love4work\Cart\Facades;
 
 use Illuminate\Support\Facades\Facade;
 

@@ -1,4 +1,4 @@
-<?php namespace Love4Work\Cart;
+<?php namespace Love4work\Cart;
 
 use Closure;
 use Gloudemans\Shoppingcart\Cart as ThirdPartyCart;
