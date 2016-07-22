@@ -160,21 +160,18 @@ class Cart extends ThirdPartyCart {
      */
     public function total($precision = 2)
     {
-        $subTotal = $this->subTotal($precision);
-
-        $newTotal = 0;
-        $process = 0;
+        $newTotal = $this->subTotal($precision);
 
         $conditions = $this->getConditions();
 
-        // if no conditions were added, just return the sub total
-        if (!$conditions->count()) return $subTotal;
+        if (!$conditions->count()) return $newTotal;
 
-        $conditions->each(function ($cond) use ($subTotal, &$newTotal, &$process, $precision) {
+        $process = 0;
+
+        $conditions->each(function ($cond) use (&$newTotal, &$process, $precision) {
             if ($cond->getTarget() === 'subtotal') {
-                $toBeCalculated = ($process > 0) ? $newTotal : $subTotal;
 
-                $newTotal = $cond->applyCondition($toBeCalculated, $precision);
+                $newTotal = $cond->applyCondition($newTotal, $precision);
 
                 $process++;
             }

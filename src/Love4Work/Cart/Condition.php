@@ -40,7 +40,7 @@ class Condition extends ThirdPartyCondition {
      * get the calculated value of this condition supplied by the subtotal|price
      *
      * @param $totalOrSubTotalOrPrice
-     * 
+     *
      * @return mixed
      */
     public function getCalculatedValue($totalOrSubTotalOrPrice) {
@@ -57,51 +57,20 @@ class Condition extends ThirdPartyCondition {
      * @return int
      */
     protected function apply($totalOrSubTotalOrPrice, $conditionValue) {
-        // if value has a percentage sign on it, we will get first
-        // its percentage then we will evaluate again if the value
-        // has a minus or plus sign so we can decide what to do with the
-        // percentage, whether to add or subtract it to the total/subtotal/price
-        // if we can't find any plus/minus sign, we will assume it as plus sign
+
+        $value = $this->cleanValue($conditionValue);
+
         if ($this->valueIsPercentage($conditionValue)) {
-            if ($this->valueIsToBeSubtracted($conditionValue)) {
-                $value = Helpers::normalizePercentage($this->cleanValue($conditionValue));
-
-                $this->parsedRawValue = $totalOrSubTotalOrPrice * ($value / 100);
-
-                $result = Helpers::round($totalOrSubTotalOrPrice - $this->parsedRawValue, $this->precision);
-            } else if ($this->valueIsToBeAdded($conditionValue)) {
-                $value = Helpers::normalizePercentage($this->cleanValue($conditionValue));
-
-                $this->parsedRawValue = $totalOrSubTotalOrPrice * ($value / 100);
-
-                $result = Helpers::round($totalOrSubTotalOrPrice + $this->parsedRawValue, $this->precision);
-            } else {
-                $value = Helpers::normalizePercentage($conditionValue);
-
-                $this->parsedRawValue = $totalOrSubTotalOrPrice * ($value / 100);
-
-                $result = Helpers::round($totalOrSubTotalOrPrice + $this->parsedRawValue, $this->precision);
-            }
+            $this->parsedRawValue = $totalOrSubTotalOrPrice * (Helpers::normalizePercentage($value) / 100);
+        } else {
+            $this->parsedRawValue = Helpers::normalizePrice($value);
         }
 
-        // if the value has no percent sign on it, the operation will not be a percentage
-        // next is we will check if it has a minus/plus sign so then we can just deduct it to total/subtotal/price
-        else {
-            if ($this->valueIsToBeSubtracted($conditionValue)) {
-                $this->parsedRawValue = Helpers::normalizePrice($this->cleanValue($conditionValue));
+        $sum = ($this->valueIsToBeSubtracted($conditionValue))
+            ? $totalOrSubTotalOrPrice - $this->parsedRawValue
+            : $totalOrSubTotalOrPrice + $this->parsedRawValue;
 
-                $result = Helpers::round($totalOrSubTotalOrPrice - $this->parsedRawValue, $this->precision);
-            } else if ($this->valueIsToBeAdded($conditionValue)) {
-                $this->parsedRawValue = Helpers::normalizePrice($this->cleanValue($conditionValue));
-
-                $result = Helpers::round($totalOrSubTotalOrPrice + $this->parsedRawValue, $this->precision);
-            } else {
-                $this->parsedRawValue = Helpers::normalizePrice($conditionValue);
-
-                $result = Helpers::round($totalOrSubTotalOrPrice + $this->parsedRawValue, $this->precision);
-            }
-        }
-
+        $result = Helpers::round($sum, $this->precision);
         // Do not allow items with negative prices.
         return $result < 0 ? 0 : $result;
     }
