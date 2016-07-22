@@ -1,183 +1,522 @@
 <?php namespace Love4Work\Cart;
 
-use Bnet\Cart\Attribute;
-use Bnet\Cart\Cart as ThirdPartyCart;
-use Bnet\Cart\Helpers\Helpers;
-use Bnet\Cart\Item;
+use Closure;
+use Gloudemans\Shoppingcart\Cart as ThirdPartyCart;
+use Gloudemans\Shoppingcart\Contracts\Buyable;
+use Gloudemans\Shoppingcart\Exceptions\CartAlreadyStoredException;
+use Gloudemans\Shoppingcart\Exceptions\InvalidRowIDException;
+use Gloudemans\Shoppingcart\Exceptions\UnknownModelException;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\DatabaseManager;
+use Illuminate\Session\SessionManager;
+use Illuminate\Support\Collection;
 
 /**
  * Class Cart
  * @package Love4Work\Cart
  */
-class Cart extends ThirdPartyCart {
+class Cart
+{
+    const DEFAULT_INSTANCE = 'default';
 
     /**
-     * add item to the cart, it can be an array or multi dimensional array
+     * Instance of the session manager.
      *
-     * @param string|array $id
-     * @param string $name
-     * @param int $price
-     * @param int $quantity
-     * @param array $attributes
-     * @param Condition|array $conditions
-     * @return $this
-     * @throws InvalidItemException
+     * @var \Illuminate\Session\SessionManager
      */
-    public function add($id, $name = null, $price = null, $quantity = 1, $attributes = array(), $conditions = array())
+    private $session;
+
+    /**
+     * Instance of the event dispatcher.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    private $events;
+
+    /**
+     * Holds the current cart instance.
+     *
+     * @var string
+     */
+    private $instance;
+
+    /**
+     * Cart constructor.
+     *
+     * @param \Illuminate\Session\SessionManager      $session
+     * @param \Illuminate\Contracts\Events\Dispatcher $events
+     */
+    public function __construct(SessionManager $session, Dispatcher $events)
     {
-        if (is_array($id)) {
-            // the first argument is an array, now we will need to check if it is a multi dimensional
-            if (!Helpers::isMultiArray($id)) {
-                $id = [$id];
-            }
+        $this->session = $session;
+        $this->events = $events;
 
-            foreach ($id as $item) {
-                $this->add(
-                    $item['id'],
-                    $item['name'],
-                    $item['price'],
-                    $item['quantity'],
-                    @$item['attributes'] ?: array(),
-                    @$item['conditions'] ?: array()
-                );
-            }
+        $this->instance(self::DEFAULT_INSTANCE);
+    }
 
-            return $this;
-        }
+    /**
+     * Set the current cart instance.
+     *
+     * @param string|null $instance
+     * @return \Gloudemans\Shoppingcart\Cart
+     */
+    public function instance($instance = null)
+    {
+        $instance = $instance ?: self::DEFAULT_INSTANCE;
 
-        // validate data
-        $item = $this->validate(array(
-            'id' => $id,
-            'name' => $name,
-            'price' => Helpers::normalizePrice($price),
-            'quantity' => $quantity,
-            'attributes' => new Attribute($attributes),
-            'conditions' => $conditions,
-        ));
-
-        // get the cart
-        $cart = $this->items();
-
-        // if the item is already in the cart we will just update it
-        if ($cart->has($id)) {
-            $this->update($id, $item);
-        } else {
-            $this->addRow($id, $item);
-        }
+        $this->instance = sprintf('%s.%s', 'cart', $instance);
 
         return $this;
     }
 
     /**
-     * update a cart
+     * Get the current cart instance.
      *
-     * @param $id
-     * @param $data
-     *
-     * the $data will be an associative array, you don't need to pass all the data, only the key value
-     * of the item you want to update on it
+     * @return string
      */
-    public function update($id, $data)
+    public function currentInstance()
     {
-        $this->events->fire($this->getInstanceName().'.updating', array($data, $this));
-
-        $cart = $this->items();
-
-        $item = $cart->pull($id);
-
-        foreach($data as $key => $value)
-        {
-            if( $key == 'quantity' ) {
-                $item = $this->updateQuantity($item, $key, $value);
-            }
-            elseif( $key == 'attributes' ) {
-                $item[$key] = new Attribute($value);
-            }
-            else {
-                $item[$key] = $value;
-            }
-        }
-
-        $cart->put($id, $item);
-
-        $this->save($cart);
-
-        $this->events->fire($this->getInstanceName().'.updated', array($item, $this));
+        return str_replace('cart.', '', $this->instance);
     }
 
     /**
-     * update a cart item quantity relative to its current quantity
+     * check if cart is empty
      *
-     * @param $item
-     * @param $key
-     * @param $value
-     * @return mixed
+     * @return bool
      */
-    protected function updateQuantity($item, $key, $value)
+    public function isEmpty()
     {
-        if( preg_match('/\-/', $value) == 1 ) {
-            $value = (int) str_replace('-','',$value);
-
-            // we will not allowed to reduced quantity to 0, so if the given value
-            // would result to item quantity of 0, we will not do it.
-            if( ($item[$key] - $value) > 0 ) {
-                $item[$key] -= $value;
-            }
-        }
-        elseif( preg_match('/\+/', $value) == 1 ) {
-            $item[$key] += (int) str_replace('+','',$value);
-        }
-        else {
-            $item[$key] = (int) $value;
-        }
-
-        return $item;
+        return ! $this->getContent()->count();
     }
 
     /**
-     * get cart sub total
+     * Add an item to the cart.
      *
-     * @param int $precision
-     *
-     * @return int
+     * @param mixed     $id
+     * @param mixed     $name
+     * @param int|float $qty
+     * @param float     $price
+     * @param array     $options
+     * @return \Gloudemans\Shoppingcart\CartItem
      */
-    public function subTotal($precision = 2) {
-        $cart = $this->items();
+    public function add($id, $name = null, $qty = null, $price = null, array $options = [])
+    {
+        if ($this->isMulti($id)) {
+            return array_map(function ($item) {
+                return $this->add($item);
+            }, $id);
+        }
 
-        $sum = $cart->sum(function (Item $item) {
-            return $item->priceSumWithConditions();
-        });
+        $cartItem = $this->createCartItem($id, $name, $qty, $price, $options);
 
-        return Helpers::round($sum, $precision);
+        $content = $this->getContent();
+
+        if ($content->has($cartItem->rowId)) {
+            $cartItem->qty += $content->get($cartItem->rowId)->qty;
+        }
+
+        $content->put($cartItem->rowId, $cartItem);
+
+        $this->events->fire('cart.added', $cartItem);
+
+        $this->session->put($this->instance, $content);
+
+        return $cartItem;
     }
 
     /**
-     * the new total in which conditions are already applied
+     * Update the cart item with the given rowId.
      *
-     * @param int $precision
-     *
-     * @return int
+     * @param string $rowId
+     * @param mixed  $qty
+     * @return void
      */
-    public function total($precision = 2)
+    public function update($rowId, $qty)
     {
-        $newTotal = $this->subTotal($precision);
+        $cartItem = $this->get($rowId);
 
-        $conditions = $this->getConditions();
+        if ($qty instanceof Buyable) {
+            $cartItem->updateFromBuyable($qty);
+        } elseif (is_array($qty)) {
+            $cartItem->updateFromArray($qty);
+        } else {
+            $cartItem->setQuantity($qty);
+        }
 
-        if (!$conditions->count()) return $newTotal;
+        $content = $this->getContent();
 
-        $process = 0;
+        // Unclear what this does, disabled for now
+        if ($rowId !== $cartItem->rowId) {
+            $content->pull($rowId);
 
-        $conditions->each(function ($cond) use (&$newTotal, &$process, $precision) {
-            if ($cond->getTarget() === 'subtotal') {
-
-                $newTotal = $cond->applyCondition($newTotal, $precision);
-
-                $process++;
+            if ($content->has($cartItem->rowId)) {
+                $existingCartItem = $this->get($cartItem->rowId);
+                $cartItem->setQuantity($existingCartItem->qty + $cartItem->qty);
             }
-        });
+        }
 
-        return $newTotal;
+        if ($cartItem->qty <= 0) {
+            $this->remove($cartItem->rowId);
+            return;
+        } else {
+            $content->put($cartItem->rowId, $cartItem);
+        }
+
+        $this->events->fire('cart.updated', $cartItem);
+
+        $this->session->put($this->instance, $content);
     }
 
+    /**
+     * Remove the cart item with the given rowId from the cart.
+     *
+     * @param string $rowId
+     * @return void
+     */
+    public function remove($rowId)
+    {
+        $cartItem = $this->get($rowId);
+
+        $content = $this->getContent();
+
+        $content->pull($cartItem->rowId);
+
+        $this->events->fire('cart.removed', $cartItem);
+
+        $this->session->put($this->instance, $content);
+    }
+
+    /**
+     * Get a cart item from the cart by its rowId.
+     *
+     * @param string $rowId
+     * @return \Love4Work\Cart\CartItem
+     */
+    public function get($rowId)
+    {
+        $content = $this->getContent();
+
+        if ( ! $content->has($rowId))
+            throw new InvalidRowIDException("The cart does not contain rowId {$rowId}.");
+
+        return $content->get($rowId);
+    }
+
+    /**
+     * Destroy the current cart instance.
+     *
+     * @return void
+     */
+    public function destroy()
+    {
+        $this->session->remove($this->instance);
+    }
+
+    /**
+     * Get the content of the cart.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function content()
+    {
+        if (is_null($this->session->get($this->instance))) {
+            return new Collection([]);
+        }
+
+        return $this->session->get($this->instance);
+    }
+
+    /**
+     * Get the number of items in the cart.
+     *
+     * @return int|float
+     */
+    public function count()
+    {
+        $content = $this->getContent();
+
+        return $content->sum('qty');
+    }
+
+    /**
+     * Get the total price of the items in the cart.
+     *
+     * @param int    $decimals
+     * @param string $decimalPoint
+     * @param string $thousandSeperator
+     * @return float
+     */
+    public function total($decimals = 2, $decimalPoint = '.', $thousandSeperator = ',')
+    {
+        $content = $this->getContent();
+
+        $total = $content->reduce(function ($total, CartItem $cartItem) {
+            return $total + ($cartItem->qty * $cartItem->priceTax);
+        }, 0);
+
+        return number_format($total, $decimals, $decimalPoint, $thousandSeperator);
+    }
+
+    /**
+     * Get the total tax of the items in the cart.
+     *
+     * @param int    $decimals
+     * @param string $decimalPoint
+     * @param string $thousandSeperator
+     * @return float
+     */
+    public function tax($decimals = 2, $decimalPoint = '.', $thousandSeperator = ',')
+    {
+        $content = $this->getContent();
+
+        $tax = $content->reduce(function ($tax, CartItem $cartItem) {
+            return $tax + ($cartItem->qty * $cartItem->tax);
+        }, 0);
+
+        return number_format($tax, $decimals, $decimalPoint, $thousandSeperator);
+    }
+
+    /**
+     * Get the subtotal (total - tax) of the items in the cart.
+     *
+     * @param int    $decimals
+     * @param string $decimalPoint
+     * @param string $thousandSeperator
+     * @return float
+     */
+    public function subtotal($decimals = 2, $decimalPoint = '.', $thousandSeperator = ',')
+    {
+        $content = $this->getContent();
+
+        $subTotal = $content->reduce(function ($subTotal, CartItem $cartItem) {
+            return $subTotal + ($cartItem->qty * $cartItem->price);
+        }, 0);
+
+        return number_format($subTotal, $decimals, $decimalPoint, $thousandSeperator);
+    }
+
+    /**
+     * Search the cart content for a cart item matching the given search closure.
+     *
+     * @param \Closure $search
+     * @return \Illuminate\Support\Collection
+     */
+    public function search(Closure $search)
+    {
+        $content = $this->getContent();
+
+        return $content->filter($search);
+    }
+
+    /**
+     * Associate the cart item with the given rowId with the given model.
+     *
+     * @param string $rowId
+     * @param mixed  $model
+     * @return void
+     */
+    public function associate($rowId, $model)
+    {
+        if(is_string($model) && ! class_exists($model)) {
+            throw new UnknownModelException("The supplied model {$model} does not exist.");
+        }
+
+        $cartItem = $this->get($rowId);
+
+        $cartItem->associate($model);
+
+        $content = $this->getContent();
+
+        $content->put($cartItem->rowId, $cartItem);
+
+        $this->session->put($this->instance, $content);
+    }
+
+    /**
+     * Set the tax rate for the cart item with the given rowId.
+     *
+     * @param string    $rowId
+     * @param int|float $taxRate
+     * @return void
+     */
+    public function setTax($rowId, $taxRate)
+    {
+        $cartItem = $this->get($rowId);
+
+        $cartItem->setTaxRate($taxRate);
+
+        $content = $this->getContent();
+
+        $content->put($cartItem->rowId, $cartItem);
+
+        $this->session->put($this->instance, $content);
+    }
+
+    /**
+     * Store an the current instance of the cart.
+     *
+     * @param mixed $identifier
+     * @return void
+     */
+    public function store($identifier)
+    {
+        $content = $this->getContent();
+
+        if ($this->storedCartWithIdentifierExists($identifier)) {
+            throw new CartAlreadyStoredException("A cart with identifier {$identifier} was already stored.");
+        }
+
+        $this->getConnection()->table($this->getTableName())->insert([
+            'identifier' => $identifier,
+            'instance' => $this->currentInstance(),
+            'content' => serialize($content)
+        ]);
+
+        $this->events->fire('cart.stored');
+    }
+
+    /**
+     * Restore the cart with the given identifier.
+     *
+     * @param mixed $identifier
+     * @return void
+     */
+    public function restore($identifier)
+    {
+        if( ! $this->storedCartWithIdentifierExists($identifier)) {
+            return;
+        }
+
+        $stored = $this->getConnection()->table($this->getTableName())
+            ->where('identifier', $identifier)->first();
+
+        $storedContent = unserialize($stored->content);
+
+        $currentInstance = $this->currentInstance();
+
+        $this->instance($stored->instance);
+
+        $content = $this->getContent();
+
+        foreach ($storedContent as $cartItem) {
+            $content->put($cartItem->rowId, $cartItem);
+        }
+
+        $this->events->fire('cart.restored');
+
+        $this->session->put($this->instance, $content);
+
+        $this->instance($currentInstance);
+
+        $this->getConnection()->table($this->getTableName())
+            ->where('identifier', $identifier)->delete();
+    }
+
+    /**
+     * Magic method to make accessing the total, tax and subtotal properties possible.
+     *
+     * @param string $attribute
+     * @return float|null
+     */
+    public function __get($attribute)
+    {
+        if($attribute === 'total') {
+            return $this->total(2, '.', '');
+        }
+
+        if($attribute === 'tax') {
+            return $this->tax(2, '.', '');
+        }
+
+        if($attribute === 'subtotal') {
+            return $this->subtotal(2, '.', '');
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the carts content, if there is no cart content set yet, return a new empty Collection
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getContent()
+    {
+        $content = $this->session->has($this->instance)
+            ? $this->session->get($this->instance)
+            : new Collection;
+
+        return $content;
+    }
+
+    /**
+     * Create a new CartItem from the supplied attributes.
+     *
+     * @param mixed     $id
+     * @param mixed     $name
+     * @param int|float $qty
+     * @param float     $price
+     * @param array     $options
+     * @return \Love4Work\Cart\CartItem
+     */
+    private function createCartItem($id, $name, $qty, $price, array $options)
+    {
+        if ($id instanceof Buyable) {
+            $cartItem = CartItem::fromBuyable($id, $qty ?: []);
+            $cartItem->setQuantity($name ?: 1);
+            $cartItem->associate($id);
+        } elseif (is_array($id)) {
+            $cartItem = CartItem::fromArray($id);
+            $cartItem->setQuantity($id['qty']);
+        } else {
+            $cartItem = CartItem::fromAttributes($id, $name, $price, $options);
+            $cartItem->setQuantity($qty);
+        }
+
+        $cartItem->setTaxRate(config('cart.tax'));
+
+        return $cartItem;
+    }
+
+    /**
+     * Check if the item is a multidimensional array or an array of Buyables.
+     *
+     * @param mixed $item
+     * @return bool
+     */
+    private function isMulti($item)
+    {
+        if ( ! is_array($item)) return false;
+
+        return is_array(head($item)) || head($item) instanceof Buyable;
+    }
+
+    /**
+     * @param $identifier
+     * @return bool
+     */
+    private function storedCartWithIdentifierExists($identifier)
+    {
+        return $this->getConnection()->table($this->getTableName())->where('identifier', $identifier)->exists();
+    }
+
+    /**
+     * Get the database connection.
+     *
+     * @return \Illuminate\Database\Connection
+     */
+    private function getConnection()
+    {
+        return app(DatabaseManager::class)->connection(config('cart.database.connection', config('database.default')));
+    }
+
+    /**
+     * Get the database table name.
+     *
+     * @return string
+     */
+    private function getTableName()
+    {
+        return config('cart.database.table', 'shoppingcart');
+    }
 }

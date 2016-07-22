@@ -1,33 +1,73 @@
 <?php
 
-abstract class TestCase extends PHPUnit_Framework_TestCase
-{
-    protected function fillCart()
-    {
-        $items = array(
-            array(
-                'id' => 456,
-                'name' => 'Sample Item 1',
-                'price' => 67.99,
-                'quantity' => 1,
-                'attributes' => array()
-            ),
-            array(
-                'id' => 568,
-                'name' => 'Sample Item 2',
-                'price' => 69.25,
-                'quantity' => 1,
-                'attributes' => array()
-            ),
-            array(
-                'id' => 856,
-                'name' => 'Sample Item 3',
-                'price' => 50.25,
-                'quantity' => 1,
-                'attributes' => array()
-            ),
-        );
+use Love4Work\Cart\Cart;
+use Gloudemans\Shoppingcart\Contracts\Buyable;
 
-        $this->cart->add($items);
+abstract class TestCase extends Orchestra\Testbench\TestCase
+{
+    /**
+     * Set the package service provider.
+     *
+     * @param \Illuminate\Foundation\Application $app
+     * @return array
+     */
+    protected function getPackageProviders($app)
+    {
+        return [\Love4Work\Cart\CartServiceProvider::class];
     }
+
+    /**
+     * Define environment setup.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     * @return void
+     */
+    protected function getEnvironmentSetUp($app)
+    {
+        $app['config']->set('cart.database.connection', 'testing');
+
+        $app['config']->set('session.driver', 'array');
+
+        $app['config']->set('database.default', 'testing');
+        $app['config']->set('database.connections.testing', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
+    }
+    
+    /**
+     * Get an instance of the cart.
+     *
+     * @return \Love4Work\Cart\Cart
+     */
+    protected function getCart()
+    {
+        $session = $this->app->make('session');
+        $events = $this->app->make('events');
+
+        $cart = new Cart($session, $events);
+
+        return $cart;
+    }
+
+    /**
+     * Get a mock of a Buyable item.
+     *
+     * @param int    $id
+     * @param string $name
+     * @param float  $price
+     * @return \Mockery\MockInterface
+     */
+    protected function getBuyableMock($id = 1, $name = 'Item name', $price = 10.00)
+    {
+        $item = Mockery::mock(Buyable::class)->shouldIgnoreMissing();
+
+        $item->shouldReceive('getBuyableIdentifier')->andReturn($id);
+        $item->shouldReceive('getBuyableDescription')->andReturn($name);
+        $item->shouldReceive('getBuyablePrice')->andReturn($price);
+
+        return $item;
+    }
+
 }
