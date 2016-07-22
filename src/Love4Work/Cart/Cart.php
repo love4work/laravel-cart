@@ -1,13 +1,71 @@
 <?php namespace Love4Work\Cart;
 
-use Darryldecode\Cart\Cart as ThirdPartyCart;
-use Darryldecode\Cart\ItemAttributeCollection;
+use Bnet\Cart\Attribute;
+use Bnet\Cart\Cart as ThirdPartyCart;
+use Bnet\Cart\Helpers\Helpers;
 
 /**
  * Class Cart
  * @package Love4Work\Cart
  */
 class Cart extends ThirdPartyCart {
+
+    /**
+     * add item to the cart, it can be an array or multi dimensional array
+     *
+     * @param string|array $id
+     * @param string $name
+     * @param int $price
+     * @param int $quantity
+     * @param array $attributes
+     * @param Condition|array $conditions
+     * @return $this
+     * @throws InvalidItemException
+     */
+    public function add($id, $name = null, $price = null, $quantity = 1, $attributes = array(), $conditions = array())
+    {
+        if (is_array($id)) {
+            // the first argument is an array, now we will need to check if it is a multi dimensional
+            if (!Helpers::isMultiArray($id)) {
+                $id = [$id];
+            }
+
+            foreach ($id as $item) {
+                $this->add(
+                    $item['id'],
+                    $item['name'],
+                    $item['price'],
+                    $item['quantity'],
+                    @$item['attributes'] ?: array(),
+                    @$item['conditions'] ?: array()
+                );
+            }
+
+            return $this;
+        }
+
+        // validate data
+        $item = $this->validate(array(
+            'id' => $id,
+            'name' => $name,
+            'price' => Helpers::normalizePrice($price),
+            'quantity' => $quantity,
+            'attributes' => new Attribute($attributes),
+            'conditions' => $conditions,
+        ));
+
+        // get the cart
+        $cart = $this->items();
+
+        // if the item is already in the cart we will just update it
+        if ($cart->has($id)) {
+            $this->update($id, $item);
+        } else {
+            $this->addRow($id, $item);
+        }
+
+        return $this;
+    }
 
     /**
      * update a cart
@@ -22,7 +80,7 @@ class Cart extends ThirdPartyCart {
     {
         $this->events->fire($this->getInstanceName().'.updating', array($data, $this));
 
-        $cart = $this->getContent();
+        $cart = $this->items();
 
         $item = $cart->pull($id);
 
@@ -34,7 +92,7 @@ class Cart extends ThirdPartyCart {
             }
             elseif( $key == 'attributes' )
             {
-                $item[$key] = new ItemAttributeCollection($value);
+                $item[$key] = new Attribute($value);
             }
             else
             {

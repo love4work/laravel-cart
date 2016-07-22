@@ -1,12 +1,12 @@
 <?php namespace Love4Work\Cart\Conditions;
 
-use Love4Work\Cart\CartCondition;
+use Love4Work\Cart\Condition;
 
 /**
- * Class CartCondition
+ * Class Tax
  * @package Love4Work\Cart
  */
-class Tax extends CartCondition
+class Tax extends Condition
 {
     /**
      * Tax constructor.

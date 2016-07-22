@@ -4,24 +4,25 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "dbb080cd98392eb249592d3fbabe7fbb",
-    "content-hash": "42683f68d16d843ae21137d557f9048f",
+    "hash": "181189d6ab13c4866a86c271cbb209ef",
+    "content-hash": "20c1d99325d3838381d17b0f050dc4ce",
     "packages": [
         {
-            "name": "darryldecode/cart",
+            "name": "bnet/laravel-cart",
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/darryldecode/laravelshoppingcart.git",
-                "reference": "8fbc1601fddd1997fab55827a3a00c71ccfc4078"
+                "url": "https://github.com/bussnet/laravelshoppingcart.git",
+                "reference": "ecba15e1a361b594c11c2573ddaf973d2eec92bd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/darryldecode/laravelshoppingcart/zipball/8fbc1601fddd1997fab55827a3a00c71ccfc4078",
-                "reference": "8fbc1601fddd1997fab55827a3a00c71ccfc4078",
+                "url": "https://api.github.com/repos/bussnet/laravelshoppingcart/zipball/ecba15e1a361b594c11c2573ddaf973d2eec92bd",
+                "reference": "ecba15e1a361b594c11c2573ddaf973d2eec92bd",
                 "shasum": ""
             },
             "require": {
+                "bnet/money-datatype": "^0.1.0",
                 "illuminate/support": "5.0.x|5.1.x|5.2.x",
                 "illuminate/validation": "5.0.x|5.1.x|5.2.x",
                 "php": ">=5.4.0"
@@ -34,7 +35,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Darryldecode\\": "src/Darryldecode"
+                    "Bnet\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -43,8 +44,8 @@
             ],
             "authors": [
                 {
-                    "name": "Darryl Fernandez",
-                    "email": "engrdarrylfernandez@gmail.com"
+                    "name": "Thorsten Buss",
+                    "email": "thorsten.buss@buss-networks.de"
                 }
             ],
             "description": "Laravel 5 Shopping cart",
@@ -53,7 +54,44 @@
                 "laravel",
                 "shopping cart"
             ],
-            "time": "2016-07-03 12:12:30"
+            "time": "2016-07-14 09:50:08"
+        },
+        {
+            "name": "bnet/money-datatype",
+            "version": "0.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bussnet/money-datatype.git",
+                "reference": "a9d0cdcfcc7966ceab0921616aac0da178e4b24c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bussnet/money-datatype/zipball/a9d0cdcfcc7966ceab0921616aac0da178e4b24c",
+                "reference": "a9d0cdcfcc7966ceab0921616aac0da178e4b24c",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "5.4.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Bnet\\": "src",
+                    "Tests\\Bnet\\": "tests"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "Thorsten Buss",
+                    "email": "info@buss-networks.de"
+                }
+            ],
+            "description": "Package for a simple money datatype",
+            "time": "2016-07-14 09:19:49"
         },
         {
             "name": "doctrine/inflector",
@@ -1831,7 +1869,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "darryldecode/cart": 20,
+        "bnet/laravel-cart": 20,
         "symfony/var-dumper": 20
     },
     "prefer-stable": false,

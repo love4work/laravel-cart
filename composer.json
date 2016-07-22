@@ -1,6 +1,6 @@
 {
     "name": "love4work/laravel-cart",
-    "description": "Wrapper for darryldecode/cart, improve API readability and improve common methods",
+    "description": "Wrapper for bnet/laravel-cart, improve API readability and improve common methods",
     "license": "MIT",
     "authors": [
         {
@@ -10,7 +10,7 @@
     ],
     "require": {
         "php": ">=5.6",
-        "darryldecode/cart": "dev-master"
+        "bnet/laravel-cart": "dev-master"
     },
     "require-dev": {
         "mockery/mockery": "~0.9",
