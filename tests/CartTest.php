@@ -24,7 +24,7 @@ class CartTest extends TestCase
 
         $cartItem = $cart->add($item);
 
-        $this->assertEquals('€ 40,00', $cartItem->subtotal());
+        $this->assertEquals('€ 40,00', $cartItem->subtotal()->format());
     }
 
     /** @test */
@@ -35,7 +35,7 @@ class CartTest extends TestCase
 
         $cartItem = $cart->add($item);
 
-        $this->assertEquals('€ 48,40', $cartItem->total());
+        $this->assertEquals('€ 48,40', $cartItem->total()->format());
     }
 
     /** @test */

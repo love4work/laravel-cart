@@ -8,6 +8,7 @@ use Gloudemans\Shoppingcart\Contracts\Buyable;
 
 class CartItem implements Arrayable
 {
+    use HasCurrency;
     /**
      * The rowID of the cart item.
      *

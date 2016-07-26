@@ -5,7 +5,6 @@ namespace Love4work\Cart;
 use Money\Currency;
 use Money\Money;
 use NumberFormatter;
-use Money\Formatter\IntlMoneyFormatter;
 
 /**
  * Class MoneyProxy
@@ -13,8 +12,16 @@ use Money\Formatter\IntlMoneyFormatter;
  */
 class MoneyProxy {
 
+    /**
+     * @var
+     */
     public static $doNotConvertToCents;
 
+    /**
+     * MoneyProxy constructor.
+     * @param $value
+     * @param Currency $currency
+     */
     public function __construct($value, Currency $currency)
     {
         $this->calculateValue($value);
@@ -22,11 +29,19 @@ class MoneyProxy {
         $this->formatter = new NumberFormatter(config('app.locale_php'), NumberFormatter::CURRENCY);
     }
 
-    public function format()
+    /**
+     * @param null $formatter
+     * @return string
+     */
+    public function format($formatter = null)
     {
-        return (new IntlMoneyFormatter($this->formatter))->format($this->money);
+        $formatter = $formatter ?: $this->formatter;
+        return $formatter->format($this->getAmount());
     }
 
+    /**
+     * @param $value
+     */
     private function calculateValue(&$value)
     {
         if(self::$doNotConvertToCents){
@@ -35,9 +50,24 @@ class MoneyProxy {
         $value *= 100;
     }
 
+    /**
+     * @return float|string
+     */
+    public function getAmount()
+    {
+        if(self::$doNotConvertToCents){
+            return $this->money->getAmount();
+        }
+
+        return ($this->money->getAmount() / 100);
+    }
+
+    /**
+     * @return string
+     */
     public function __toString()
     {
-        return $this->money->getAmount();
+        return (string) $this->getAmount();
     }
 }
 

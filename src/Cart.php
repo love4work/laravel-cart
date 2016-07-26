@@ -243,10 +243,9 @@ class Cart
     /**
      * Get the total price of the items in the cart.
      *
-     * @param int    $decimals
      * @return \Love4work\Cart\MoneyProxy
      */
-    public function total($decimals = 2)
+    public function total()
     {
         $content = $this->getContent();
 
@@ -260,10 +259,9 @@ class Cart
     /**
      * Get the total tax of the items in the cart.
      *
-     * @param int    $decimals
      * @return \Love4work\Cart\MoneyProxy
      */
-    public function tax($decimals = 2)
+    public function tax()
     {
         $content = $this->getContent();
 
@@ -277,10 +275,9 @@ class Cart
     /**
      * Get the subtotal (total - tax) of the items in the cart.
      *
-     * @param int    $decimals
      * @return \Love4work\Cart\MoneyProxy
      */
-    public function subtotal($decimals = 2)
+    public function subtotal()
     {
         $content = $this->getContent();
 
