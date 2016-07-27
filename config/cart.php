@@ -12,6 +12,4 @@ return [
     'tax' => 21,
     
     'defaultCurrency' => 'EUR',
-    'decimalSeperator' => ',',
-    'thousandSeperator' => '.'
 ];
