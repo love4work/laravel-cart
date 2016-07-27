@@ -9,7 +9,6 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Session\SessionManager;
 use Illuminate\Support\Collection;
-use Money\Currency;
 
 /**
  * Class Cart
@@ -60,7 +59,7 @@ class Cart
      * Set the current cart instance.
      *
      * @param string|null $instance
-     * @return \Gloudemans\Shoppingcart\Cart
+     * @return \Love4work\Cart\Cart
      */
     public function instance($instance = null)
     {
@@ -99,7 +98,7 @@ class Cart
      * @param int|float $qty
      * @param float     $price
      * @param array     $options
-     * @return \Gloudemans\Shoppingcart\CartItem
+     * @return \Love4work\Cart\CartItem
      */
     public function add($id, $name = null, $qty = null, $price = null, array $options = [])
     {
