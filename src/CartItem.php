@@ -186,9 +186,9 @@ class CartItem implements Arrayable
      */
     public function updateFromBuyable(Buyable $item)
     {
-        $this->id       = $item->getBuyableIdentifier();
-        $this->name     = $item->getBuyableDescription();
-        $this->price    = $item->getBuyablePrice();
+        $this->id       = $item->getBuyableIdentifier($this->options);
+        $this->name     = $item->getBuyableDescription($this->options);
+        $this->price    = $item->getBuyablePrice($this->options);
         $this->priceTax = $this->price + $this->tax;
     }
 
@@ -280,7 +280,7 @@ class CartItem implements Arrayable
      */
     public static function fromBuyable(Buyable $item, array $options = [])
     {
-        return new self($item->getBuyableIdentifier(), $item->getBuyableDescription(), $item->getBuyablePrice(), $options);
+        return new self($item->getBuyableIdentifier($options), $item->getBuyableDescription($options), $item->getBuyablePrice($options), $options);
     }
 
     /**
