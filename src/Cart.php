@@ -413,15 +413,15 @@ class Cart
     public function __get($attribute)
     {
         if($attribute === 'total') {
-            return $this->total(2);
+            return $this->total();
         }
 
         if($attribute === 'tax') {
-            return $this->tax(2);
+            return $this->tax();
         }
 
         if($attribute === 'subtotal') {
-            return $this->subtotal(2);
+            return $this->subtotal();
         }
 
         return null;
