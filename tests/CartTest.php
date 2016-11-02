@@ -59,4 +59,21 @@ class CartTest extends TestCase
 
         $this->assertEquals('€ 10,00', $cart->total()->format());
     }
+
+    /** @test */
+    public function it_has_tax_in_total_price()
+    {
+        $cart = $this->getCart();
+        $item = $this->getBuyableMock();
+
+        $cartItem = $cart->add($item)->setTaxRate(21);
+
+        $this->assertEquals(12.1, $cartItem->total()->getAmount());
+        $this->assertEquals(12.1, $cart->total()->getAmount());
+
+        $cartItem->setTaxRate(10);
+
+        $this->assertEquals(11, $cartItem->total()->getAmount());
+        $this->assertEquals(11, $cart->total()->getAmount());
+    }
 }

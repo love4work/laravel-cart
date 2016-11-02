@@ -1,14 +1,16 @@
-<?php namespace Love4work\Cart;
+<?php
+
+namespace Love4work\Cart;
 
 use Closure;
+use Illuminate\Support\Collection;
+use Illuminate\Session\SessionManager;
+use Illuminate\Database\DatabaseManager;
+use Illuminate\Contracts\Events\Dispatcher;
 use Gloudemans\Shoppingcart\Contracts\Buyable;
-use Gloudemans\Shoppingcart\Exceptions\CartAlreadyStoredException;
 use Gloudemans\Shoppingcart\Exceptions\InvalidRowIDException;
 use Gloudemans\Shoppingcart\Exceptions\UnknownModelException;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Database\DatabaseManager;
-use Illuminate\Session\SessionManager;
-use Illuminate\Support\Collection;
+use Gloudemans\Shoppingcart\Exceptions\CartAlreadyStoredException;
 
 /**
  * Class Cart
@@ -130,7 +132,7 @@ class Cart
      *
      * @param string $rowId
      * @param mixed  $qty
-     * @return void
+     * @return \Love4work\Cart\CartItem
      */
     public function update($rowId, $qty)
     {
@@ -166,6 +168,8 @@ class Cart
         $this->events->fire('cart.updated', $cartItem);
 
         $this->session->put($this->instance, $content);
+
+        return $cartItem;
     }
 
     /**
@@ -249,7 +253,7 @@ class Cart
         $content = $this->getContent();
 
         $total = $content->reduce(function ($total, CartItem $cartItem) {
-            return $total + ($cartItem->qty * $cartItem->priceTax);
+            return $total + $cartItem->total()->getAmount();
         }, 0);
 
         return new MoneyProxy($total, $this->currency());
@@ -265,7 +269,7 @@ class Cart
         $content = $this->getContent();
 
         $tax = $content->reduce(function ($tax, CartItem $cartItem) {
-            return $tax + ($cartItem->qty * $cartItem->tax);
+            return $tax + $cartItem->taxTotal()->getAmount();
         }, 0);
 
         return new MoneyProxy($tax, $this->currency());
@@ -408,7 +412,7 @@ class Cart
      * Magic method to make accessing the total, tax and subtotal properties possible.
      *
      * @param string $attribute
-     * @return float|null
+     * @return MoneyProxy
      */
     public function __get($attribute)
     {
