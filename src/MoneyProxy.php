@@ -51,11 +51,12 @@ class MoneyProxy {
     }
 
     /**
+     * @param bool $convert
      * @return float|string
      */
-    public function getAmount()
+    public function getAmount($convert = false)
     {
-        if(self::$doNotConvertToCents){
+        if(self::$doNotConvertToCents || $convert){
             return $this->money->getAmount();
         }
 
