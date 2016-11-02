@@ -1,4 +1,8 @@
 # laravel-cart
+<p align="center">
+<a href="https://travis-ci.org/love4work/laravel-cart"><img src="https://travis-ci.org/love4work/laravel-cart.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/love4work/laravel-cart"><img src="https://poser.pugx.org/love4work/laravel-cart/d/total.svg" alt="Total Downloads"></a>
+</p>
 wrapper for gloudemans/shoppingcart
 
 ##Security Vulnerabilities
