@@ -47,7 +47,7 @@ class MoneyProxy {
         if(self::$doNotConvertToCents){
             return;
         }
-        $value = intval(strval($value) * 100);
+        $value = intval(strval(floatval($value)*100));
     }
 
     /**
